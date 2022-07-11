@@ -1,0 +1,71 @@
+service: cadastro-funcionarios
+
+plugins:
+  - serverless-offline
+
+provider:
+ name: aws
+ runtime: nodejs12.x
+
+ iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - dynamodb:DeleteItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+      Resource: arn:aws:dynamodb:us-east-1:013290375381:table/FUNCIONARIOS
+
+functions:
+  listarFuncionarios:
+    handler: handler.listarFuncionarios
+    events:
+      - http:
+          path: funcionarios
+          method: get
+
+  obterFuncionario:
+    handler: handler.obterFuncionario
+    events:
+      - http:
+          path: funcionarios/{funcionarioId}
+          method: get
+
+  cadastrarFuncionario:
+    handler: handler.cadastrarFuncionario
+    events:
+      - http:
+          path: funcionarios
+          method: post  
+
+  atualizarFuncionario:
+    handler: handler.atualizarFuncionario
+    events:
+      - http:
+          path: funcionarios/{funcionarioId}
+          method: put 
+
+  excluirFuncionario:
+    handler: handler.excluirFuncionario
+    events:
+      - http:
+          path: funcionarios/{funcionarioId}
+          method: delete                        
+
+resources:
+  Resources:
+    FuncionariosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: FUNCIONARIOS
+        AttributeDefinitions:
+          - AttributeName: funcionario_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: funcionario_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
